@@ -3,10 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FrameTag — UI Annotation Studio</title>
+<title>Uiland — UI Annotation Studio</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;600;700;800&display=swap');
-:root{--bg:#0d0f14;--sur:#161921;--sur2:#1e2230;--sur3:#252a3a;--bdr:#2d3348;--acc:#5b7cf6;--grn:#22d3a5;--amb:#f59e0b;--red:#ef4444;--pnk:#ec4899;--pur:#a78bfa;--txt:#e8eaf0;--tx2:#8b91a8;--tx3:#555d78;--mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;}
+:root{--bg:#f6f7fb;--sur:#ffffff;--sur2:#f4f6fb;--sur3:#edf1f7;--bdr:#d9dfeb;--acc:#3b82f6;--grn:#10b981;--amb:#f59e0b;--red:#ef4444;--pnk:#ec4899;--pur:#8b5cf6;--txt:#0f172a;--tx2:#475569;--tx3:#94a3b8;--mono:'IBM Plex Mono',monospace;--sans:'Syne',sans-serif;}
+body.dark{--bg:#0d0f14;--sur:#161921;--sur2:#1e2230;--sur3:#252a3a;--bdr:#2d3348;--acc:#5b7cf6;--grn:#22d3a5;--amb:#f59e0b;--red:#ef4444;--pnk:#ec4899;--pur:#a78bfa;--txt:#e8eaf0;--tx2:#8b91a8;--tx3:#555d78;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--bg);color:var(--txt);height:100vh;overflow:hidden;display:flex;flex-direction:column;}
 .hdr{display:flex;align-items:center;padding:0 14px;height:46px;background:var(--sur);border-bottom:1px solid var(--bdr);gap:10px;flex-shrink:0;z-index:200;}
@@ -18,6 +19,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--txt);height:100vh;
 .mbtn.rev-a{background:var(--pur);color:#fff;}
 .hproj{font-family:var(--mono);font-size:10px;color:var(--tx2);background:var(--sur2);border:1px solid var(--bdr);padding:3px 9px;border-radius:4px;cursor:pointer;display:flex;align-items:center;gap:5px;}
 .hproj:hover{border-color:var(--acc);color:var(--txt);}
+.theme-sw{display:flex;align-items:center;gap:4px;background:var(--sur2);border:1px solid var(--bdr);border-radius:6px;padding:2px;}
+.theme-btn{font-family:var(--mono);font-size:10px;padding:4px 9px;border-radius:4px;border:none;background:transparent;color:var(--tx2);cursor:pointer;transition:all .15s;}
+.theme-btn.ta{background:var(--sur3);color:var(--txt);}
+.ltools{padding:0 7px 7px;display:flex;flex-direction:column;gap:6px;}
+.lhelper{margin:0 7px 7px;padding:8px;border:1px solid var(--bdr);background:var(--sur2);border-radius:6px;font-family:var(--mono);font-size:9px;color:var(--tx2);line-height:1.6;}
+.lhelper b{color:var(--txt);}
+.quickwrap{padding:0 7px 7px;display:flex;flex-wrap:wrap;gap:5px;}
+.qsbtn{padding:5px 8px;border:1px solid var(--bdr);border-radius:999px;background:var(--sur2);font-family:var(--mono);font-size:9px;color:var(--txt);cursor:pointer;display:flex;gap:6px;align-items:center;}
+.qsbtn:hover,.qsbtn.active{border-color:var(--acc);color:var(--acc);}
+.qsmeta{color:var(--tx3);font-size:8px;}
+.label-search-row{padding:0 7px 7px;}
+.count-pill{font-family:var(--mono);font-size:8px;color:var(--tx2);background:var(--sur3);padding:1px 5px;border-radius:999px;}
+.review-helper{padding:0 8px 8px;font-family:var(--mono);font-size:9px;color:var(--tx2);line-height:1.7;}
+.review-helper b{color:var(--txt);}
+
 .hsp{flex:1;}
 .hstats{display:flex;gap:14px;font-family:var(--mono);font-size:10px;color:var(--tx2);}
 .hstats b{color:var(--grn);}
@@ -58,7 +74,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--txt);height:100vh;
 .rsrow:last-child{margin-bottom:0;}
 .rsrow b{color:var(--txt);}
 /* CANVAS */
-.carea{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;background:#080a0e;}
+.carea{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;background:var(--sur3);}
 .ctb{display:flex;align-items:center;padding:5px 10px;background:var(--sur);border-bottom:1px solid var(--bdr);gap:5px;flex-shrink:0;}
 .tbtn{width:30px;height:30px;border-radius:5px;border:1px solid var(--bdr);background:var(--sur2);color:var(--tx2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;transition:all .15s;flex-shrink:0;}
 .tbtn:hover{border-color:var(--acc);color:var(--acc);}
@@ -184,12 +200,13 @@ kbd{background:var(--sur3);border:1px solid var(--bdr);border-radius:2px;padding
 </head>
 <body>
 <div class="hdr">
-  <div class="logo"><div class="ldot"></div>FrameTag</div>
+  <div class="logo"><div class="ldot"></div>Uiland</div>
   <div class="mode-sw">
     <button class="mbtn ann-a" id="mAnn" onclick="setMode('annotate')">✏ Annotate</button>
     <button class="mbtn" id="mRev" onclick="setMode('review')">🔍 Review</button>
   </div>
   <div class="hproj" onclick="openProjModal()">🗂 <span id="projName">Untitled Project</span></div>
+  <div class="theme-sw"><button class="theme-btn ta" id="themeLight" onclick="setTheme('light')">☀ Light</button><button class="theme-btn" id="themeDark" onclick="setTheme('dark')">🌙 Dark</button></div>
   <div class="hsp"></div>
   <div class="hstats">Images: <b id="hsi">0</b> &nbsp; Annotated: <b id="hsa">0</b> &nbsp; Boxes: <b id="hsb">0</b></div>
   <button class="hbtn" onclick="openLoadMdl()">📂 Load</button>
@@ -221,7 +238,7 @@ kbd{background:var(--sur3);border:1px solid var(--bdr);border-radius:2px;padding
     <div class="cwrap" id="CW">
       <div class="cempty" id="CE"><div class="cei">🖼</div><div>Load a folder of images to begin</div></div>
       <canvas id="mc" style="display:none;"></canvas>
-      <div class="kbhint" id="KH" style="display:none;"><kbd>B</kbd> Box &nbsp;<kbd>S</kbd> Select &nbsp;<kbd>Del</kbd> Remove &nbsp;<kbd>←→</kbd> Navigate &nbsp;<kbd>1-9</kbd> Labels &nbsp;<kbd>Ctrl+Z</kbd> Undo</div>
+      <div class="kbhint" id="KH" style="display:none;"><kbd>B</kbd> Box &nbsp;<kbd>S</kbd> Select &nbsp;<kbd>Del</kbd> Remove &nbsp;<kbd>←→</kbd> Navigate &nbsp;<kbd>1-9</kbd> Quick UI &nbsp;<kbd>Ctrl+Z</kbd> Undo</div>
       <div class="revbadge" id="RB" style="display:none;">🔍 Review Mode — annotating &amp; editing enabled</div>
     </div>
     <div class="qbar" id="QB" style="display:none;"></div>
@@ -280,7 +297,7 @@ kbd{background:var(--sur3);border:1px solid var(--bdr);border-radius:2px;padding
     <div class="mtitle">Load / Import</div>
     <div class="msub">Resume a session or import annotations</div>
     <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
-      <button class="hbtn" style="text-align:left;" onclick="document.getElementById('si').click()">📂 Load FrameTag Session JSON</button>
+      <button class="hbtn" style="text-align:left;" onclick="document.getElementById('si').click()">📂 Load Uiland Session JSON</button>
       <button class="hbtn" style="text-align:left;" onclick="document.getElementById('ii').click()">📥 Import COCO / Roboflow JSON</button>
     </div>
     <input type="file" id="si" accept=".json">
@@ -314,30 +331,275 @@ kbd{background:var(--sur3);border:1px solid var(--bdr);border-radius:2px;padding
 
 <script>
 // ═══════════════════════════ STATE ═══════════════════════════
+function colorFor(n){
+  const h=Array.from(String(n)).reduce((a,c)=>a+c.charCodeAt(0),0)%360;
+  return `hsl(${h},65%,60%)`;
+}
+const DEFAULT_UI_ELEMENTS=[
+    {n:"3D Viewer",c:colorFor("3D Viewer"),ct:0},
+    {n:"Accordion",c:colorFor("Accordion"),ct:240},
+    {n:"Account Dropdown",c:colorFor("Account Dropdown"),ct:6},
+    {n:"Action Sheet",c:colorFor("Action Sheet"),ct:153},
+    {n:"Alert",c:colorFor("Alert"),ct:82},
+    {n:"Alert Box",c:colorFor("Alert Box"),ct:236},
+    {n:"Alertdialog",c:colorFor("Alertdialog"),ct:2},
+    {n:"Alignment Container",c:colorFor("Alignment Container"),ct:0},
+    {n:"App Bar",c:colorFor("App Bar"),ct:70},
+    {n:"Audio Player",c:colorFor("Audio Player"),ct:261},
+    {n:"Auto-complete Input",c:colorFor("Auto-complete Input"),ct:21},
+    {n:"Avatar",c:colorFor("Avatar"),ct:373},
+    {n:"Back Arrow Icon",c:colorFor("Back Arrow Icon"),ct:5220},
+    {n:"Backdrop",c:colorFor("Backdrop"),ct:238},
+    {n:"Background",c:colorFor("Background"),ct:70},
+    {n:"Badge",c:colorFor("Badge"),ct:39},
+    {n:"Banner",c:colorFor("Banner"),ct:128},
+    {n:"Bottom Navigation Bar",c:colorFor("Bottom Navigation Bar"),ct:2300},
+    {n:"bottom sheet",c:colorFor("bottom sheet"),ct:831},
+    {n:"Box",c:colorFor("Box"),ct:22},
+    {n:"Breadcrumb Schema",c:colorFor("Breadcrumb Schema"),ct:0},
+    {n:"Breadcrumbs",c:colorFor("Breadcrumbs"),ct:0},
+    {n:"Button",c:colorFor("Button"),ct:9762},
+    {n:"Calendar",c:colorFor("Calendar"),ct:84},
+    {n:"camera",c:colorFor("camera"),ct:29},
+    {n:"Canvas",c:colorFor("Canvas"),ct:92},
+    {n:"Captcha",c:colorFor("Captcha"),ct:1},
+    {n:"Card",c:colorFor("Card"),ct:4529},
+    {n:"Carousel",c:colorFor("Carousel"),ct:247},
+    {n:"Chart",c:colorFor("Chart"),ct:45},
+    {n:"Chat Bubble",c:colorFor("Chat Bubble"),ct:300},
+    {n:"Checkbox",c:colorFor("Checkbox"),ct:314},
+    {n:"Chip",c:colorFor("Chip"),ct:32},
+    {n:"circle charts",c:colorFor("circle charts"),ct:29},
+    {n:"class_name",c:colorFor("class_name"),ct:0},
+    {n:"Clipboard Copy Button",c:colorFor("Clipboard Copy Button"),ct:124},
+    {n:"Code Editor",c:colorFor("Code Editor"),ct:0},
+    {n:"Collapsible Panel",c:colorFor("Collapsible Panel"),ct:0},
+    {n:"Color Picker",c:colorFor("Color Picker"),ct:2},
+    {n:"Column",c:colorFor("Column"),ct:33},
+    {n:"Combo Box",c:colorFor("Combo Box"),ct:0},
+    {n:"Command Bar",c:colorFor("Command Bar"),ct:0},
+    {n:"Command Palette",c:colorFor("Command Palette"),ct:0},
+    {n:"Comment Thread",c:colorFor("Comment Thread"),ct:0},
+    {n:"Complementary",c:colorFor("Complementary"),ct:0},
+    {n:"Confirmation Dialog",c:colorFor("Confirmation Dialog"),ct:40},
+    {n:"Container",c:colorFor("Container"),ct:209},
+    {n:"Contentinfo",c:colorFor("Contentinfo"),ct:35},
+    {n:"Context Menu",c:colorFor("Context Menu"),ct:0},
+    {n:"Data Grid",c:colorFor("Data Grid"),ct:0},
+    {n:"Date Picker",c:colorFor("Date Picker"),ct:76},
+    {n:"Debug Console",c:colorFor("Debug Console"),ct:0},
+    {n:"Dialog",c:colorFor("Dialog"),ct:3},
+    {n:"Dialogue Box",c:colorFor("Dialogue Box"),ct:14},
+    {n:"Divider",c:colorFor("Divider"),ct:75},
+    {n:"Donut Chart",c:colorFor("Donut Chart"),ct:3},
+    {n:"Download Button",c:colorFor("Download Button"),ct:68},
+    {n:"Drag Handle",c:colorFor("Drag Handle"),ct:168},
+    {n:"Drawer",c:colorFor("Drawer"),ct:0},
+    {n:"Drill-down Widget",c:colorFor("Drill-down Widget"),ct:1},
+    {n:"Dropdown",c:colorFor("Dropdown"),ct:2372},
+    {n:"Dropdown Button",c:colorFor("Dropdown Button"),ct:34},
+    {n:"Dropdown Menu",c:colorFor("Dropdown Menu"),ct:219},
+    {n:"empty",c:colorFor("empty"),ct:31},
+    {n:"Empty State",c:colorFor("Empty State"),ct:98},
+    {n:"Error Message",c:colorFor("Error Message"),ct:37},
+    {n:"Explore icon",c:colorFor("Explore icon"),ct:120},
+    {n:"File Browser",c:colorFor("File Browser"),ct:4},
+    {n:"File Upload",c:colorFor("File Upload"),ct:10},
+    {n:"filter buttons",c:colorFor("filter buttons"),ct:57},
+    {n:"Filter Chip",c:colorFor("Filter Chip"),ct:50},
+    {n:"Filter Panel",c:colorFor("Filter Panel"),ct:30},
+    {n:"Flex Layout",c:colorFor("Flex Layout"),ct:0},
+    {n:"Floating Action Button",c:colorFor("Floating Action Button"),ct:755},
+    {n:"Floating Menu",c:colorFor("Floating Menu"),ct:4},
+    {n:"Floating Navigation Button",c:colorFor("Floating Navigation Button"),ct:233},
+    {n:"Footer",c:colorFor("Footer"),ct:3},
+    {n:"Form",c:colorFor("Form"),ct:33},
+    {n:"Frame",c:colorFor("Frame"),ct:80},
+    {n:"Gallery",c:colorFor("Gallery"),ct:8},
+    {n:"Gauge",c:colorFor("Gauge"),ct:5},
+    {n:"Gesture Area",c:colorFor("Gesture Area"),ct:0},
+    {n:"Graph",c:colorFor("Graph"),ct:12},
+    {n:"Grid",c:colorFor("Grid"),ct:20},
+    {n:"Grid View",c:colorFor("Grid View"),ct:23},
+    {n:"hamburger menu",c:colorFor("hamburger menu"),ct:467},
+    {n:"Header",c:colorFor("Header"),ct:34},
+    {n:"Heading",c:colorFor("Heading"),ct:728},
+    {n:"Health Bar",c:colorFor("Health Bar"),ct:0},
+    {n:"Heatmap",c:colorFor("Heatmap"),ct:0},
+    {n:"hero image",c:colorFor("hero image"),ct:209},
+    {n:"Histogram",c:colorFor("Histogram"),ct:54},
+    {n:"Hover Card",c:colorFor("Hover Card"),ct:14},
+    {n:"HStack",c:colorFor("HStack"),ct:0},
+    {n:"HUD",c:colorFor("HUD"),ct:81},
+    {n:"Icon",c:colorFor("Icon"),ct:27906},
+    {n:"Icon Button",c:colorFor("Icon Button"),ct:3028},
+    {n:"iic",c:colorFor("iic"),ct:0},
+    {n:"Illustration",c:colorFor("Illustration"),ct:890},
+    {n:"Image",c:colorFor("Image"),ct:2080},
+    {n:"Inventory Panel",c:colorFor("Inventory Panel"),ct:0},
+    {n:"Joystick",c:colorFor("Joystick"),ct:0},
+    {n:"Kanban Board",c:colorFor("Kanban Board"),ct:0},
+    {n:"key",c:colorFor("key"),ct:0},
+    {n:"KPI Card",c:colorFor("KPI Card"),ct:0},
+    {n:"Label",c:colorFor("Label"),ct:92},
+    {n:"Lightbox Viewer",c:colorFor("Lightbox Viewer"),ct:0},
+    {n:"List",c:colorFor("List"),ct:252},
+    {n:"loader",c:colorFor("loader"),ct:25},
+    {n:"loading Screen",c:colorFor("loading Screen"),ct:181},
+    {n:"Loading Spinner",c:colorFor("Loading Spinner"),ct:414},
+    {n:"loc",c:colorFor("loc"),ct:0},
+    {n:"Log",c:colorFor("Log"),ct:1},
+    {n:"Login Form",c:colorFor("Login Form"),ct:22},
+    {n:"logo",c:colorFor("logo"),ct:416},
+    {n:"Logout Button",c:colorFor("Logout Button"),ct:17},
+    {n:"Lottie Animation",c:colorFor("Lottie Animation"),ct:0},
+    {n:"Main",c:colorFor("Main"),ct:0},
+    {n:"Map",c:colorFor("Map"),ct:133},
+    {n:"Map Embed",c:colorFor("Map Embed"),ct:0},
+    {n:"Markdown Viewer",c:colorFor("Markdown Viewer"),ct:0},
+    {n:"Marquee",c:colorFor("Marquee"),ct:0},
+    {n:"Menu",c:colorFor("Menu"),ct:39},
+    {n:"Menu Button",c:colorFor("Menu Button"),ct:117},
+    {n:"Meter",c:colorFor("Meter"),ct:0},
+    {n:"Metric Widget",c:colorFor("Metric Widget"),ct:0},
+    {n:"Mini-map",c:colorFor("Mini-map"),ct:77},
+    {n:"Minimap",c:colorFor("Minimap"),ct:3},
+    {n:"Modal",c:colorFor("Modal"),ct:229},
+    {n:"Multiselect",c:colorFor("Multiselect"),ct:59},
+    {n:"Navigation",c:colorFor("Navigation"),ct:2},
+    {n:"Navigation Bar",c:colorFor("Navigation Bar"),ct:434},
+    {n:"Notification",c:colorFor("Notification"),ct:16},
+    {n:"Notification Bell Icon",c:colorFor("Notification Bell Icon"),ct:337},
+    {n:"Number Input",c:colorFor("Number Input"),ct:845},
+    {n:"onboarding",c:colorFor("onboarding"),ct:19},
+    {n:"OTP Input",c:colorFor("OTP Input"),ct:106},
+    {n:"overflow menu",c:colorFor("overflow menu"),ct:1900},
+    {n:"Overlay",c:colorFor("Overlay"),ct:170},
+    {n:"Overlay Layer",c:colorFor("Overlay Layer"),ct:24},
+    {n:"Pagination",c:colorFor("Pagination"),ct:6},
+    {n:"Pan Control",c:colorFor("Pan Control"),ct:0},
+    {n:"Panel",c:colorFor("Panel"),ct:22},
+    {n:"Paragraph",c:colorFor("Paragraph"),ct:95},
+    {n:"Password Input",c:colorFor("Password Input"),ct:406},
+    {n:"Password Reset Form",c:colorFor("Password Reset Form"),ct:25},
+    {n:"pause icon",c:colorFor("pause icon"),ct:19},
+    {n:"Pie Chart",c:colorFor("Pie Chart"),ct:0},
+    {n:"Placeholder",c:colorFor("Placeholder"),ct:24},
+    {n:"play icon",c:colorFor("play icon"),ct:4},
+    {n:"Poll Widget",c:colorFor("Poll Widget"),ct:0},
+    {n:"Popup",c:colorFor("Popup"),ct:194},
+    {n:"Preferences Dialog",c:colorFor("Preferences Dialog"),ct:0},
+    {n:"Print Button",c:colorFor("Print Button"),ct:0},
+    {n:"Profile Picture",c:colorFor("Profile Picture"),ct:289},
+    {n:"Progress Bar",c:colorFor("Progress Bar"),ct:208},
+    {n:"Progress Circle",c:colorFor("Progress Circle"),ct:175},
+    {n:"Progress Indicator",c:colorFor("Progress Indicator"),ct:387},
+    {n:"Progressbar",c:colorFor("Progressbar"),ct:222},
+    {n:"Radio Button",c:colorFor("Radio Button"),ct:282},
+    {n:"Range Selector",c:colorFor("Range Selector"),ct:38},
+    {n:"Range Slider",c:colorFor("Range Slider"),ct:21},
+    {n:"Rating Stars",c:colorFor("Rating Stars"),ct:247},
+    {n:"Region",c:colorFor("Region"),ct:0},
+    {n:"Resizer",c:colorFor("Resizer"),ct:4},
+    {n:"Responsive Breakpoints",c:colorFor("Responsive Breakpoints"),ct:0},
+    {n:"Review Box",c:colorFor("Review Box"),ct:3},
+    {n:"Row",c:colorFor("Row"),ct:0},
+    {n:"Scheduler",c:colorFor("Scheduler"),ct:38},
+    {n:"Scroll Area",c:colorFor("Scroll Area"),ct:9},
+    {n:"Scroll Bar",c:colorFor("Scroll Bar"),ct:14},
+    {n:"Scroll Indicator",c:colorFor("Scroll Indicator"),ct:9},
+    {n:"Search",c:colorFor("Search"),ct:146},
+    {n:"Search Box",c:colorFor("Search Box"),ct:714},
+    {n:"Search Field",c:colorFor("Search Field"),ct:35},
+    {n:"Section",c:colorFor("Section"),ct:15},
+    {n:"sett",c:colorFor("sett"),ct:0},
+    {n:"Settings Panel",c:colorFor("Settings Panel"),ct:168},
+    {n:"Sheet",c:colorFor("Sheet"),ct:67},
+    {n:"Shortcut Hint",c:colorFor("Shortcut Hint"),ct:0},
+    {n:"Sidebar",c:colorFor("Sidebar"),ct:3},
+    {n:"Signup Form",c:colorFor("Signup Form"),ct:52},
+    {n:"Skeleton Loader",c:colorFor("Skeleton Loader"),ct:323},
+    {n:"Slider",c:colorFor("Slider"),ct:89},
+    {n:"Snackbar",c:colorFor("Snackbar"),ct:9},
+    {n:"Sort Control",c:colorFor("Sort Control"),ct:1},
+    {n:"Spacer",c:colorFor("Spacer"),ct:0},
+    {n:"Spinner",c:colorFor("Spinner"),ct:146},
+    {n:"Split Button",c:colorFor("Split Button"),ct:27},
+    {n:"Split Pane Handle",c:colorFor("Split Pane Handle"),ct:0},
+    {n:"Stack",c:colorFor("Stack"),ct:110},
+    {n:"Statistic Widget",c:colorFor("Statistic Widget"),ct:0},
+    {n:"Status",c:colorFor("Status"),ct:248},
+    {n:"Status Indicator",c:colorFor("Status Indicator"),ct:80},
+    {n:"Stepper",c:colorFor("Stepper"),ct:60},
+    {n:"Subtitle",c:colorFor("Subtitle"),ct:13},
+    {n:"Survey Form",c:colorFor("Survey Form"),ct:0},
+    {n:"Swipe Indicator",c:colorFor("Swipe Indicator"),ct:57},
+    {n:"Switch",c:colorFor("Switch"),ct:0},
+    {n:"Table",c:colorFor("Table"),ct:43},
+    {n:"Table View",c:colorFor("Table View"),ct:3},
+    {n:"Tablist",c:colorFor("Tablist"),ct:11},
+    {n:"tabs",c:colorFor("tabs"),ct:972},
+    {n:"Tabs",c:colorFor("Tabs"),ct:587},
+    {n:"Tag",c:colorFor("Tag"),ct:626},
+    {n:"Tag Cloud",c:colorFor("Tag Cloud"),ct:0},
+    {n:"Tag Selector",c:colorFor("Tag Selector"),ct:246},
+    {n:"Terminal Window",c:colorFor("Terminal Window"),ct:0},
+    {n:"Text",c:colorFor("Text"),ct:959},
+    {n:"Text Area",c:colorFor("Text Area"),ct:187},
+    {n:"Text Input",c:colorFor("Text Input"),ct:1865},
+    {n:"Thumbnail",c:colorFor("Thumbnail"),ct:0},
+    {n:"Time Picker",c:colorFor("Time Picker"),ct:23},
+    {n:"Timeline",c:colorFor("Timeline"),ct:0},
+    {n:"Toast",c:colorFor("Toast"),ct:267},
+    {n:"Toggle Button",c:colorFor("Toggle Button"),ct:556},
+    {n:"Toggle Switch",c:colorFor("Toggle Switch"),ct:735},
+    {n:"Toolbar",c:colorFor("Toolbar"),ct:0},
+    {n:"Tooltip",c:colorFor("Tooltip"),ct:71},
+    {n:"Tooltip Help Icon",c:colorFor("Tooltip Help Icon"),ct:3},
+    {n:"Top Bar",c:colorFor("Top Bar"),ct:0},
+    {n:"Tree",c:colorFor("Tree"),ct:0},
+    {n:"Tree Selector",c:colorFor("Tree Selector"),ct:1},
+    {n:"Tree View",c:colorFor("Tree View"),ct:0},
+    {n:"Treeitem",c:colorFor("Treeitem"),ct:0},
+    {n:"Trend Line Chart",c:colorFor("Trend Line Chart"),ct:23},
+    {n:"Upload Progress Bar",c:colorFor("Upload Progress Bar"),ct:2},
+    {n:"User Badge",c:colorFor("User Badge"),ct:2},
+    {n:"Validation Message",c:colorFor("Validation Message"),ct:0},
+    {n:"Video Player",c:colorFor("Video Player"),ct:91},
+    {n:"Virtual Scroll List",c:colorFor("Virtual Scroll List"),ct:14},
+    {n:"VStack",c:colorFor("VStack"),ct:0},
+    {n:"Warning",c:colorFor("Warning"),ct:12},
+    {n:"Watermark",c:colorFor("Watermark"),ct:3},
+    {n:"Window",c:colorFor("Window"),ct:0},
+    {n:"Wizard",c:colorFor("Wizard"),ct:0},
+    {n:"Zoom Control",c:colorFor("Zoom Control"),ct:2}
+  ];
+const DEFAULT_SCREEN_TYPES=[
+    {n:"Home Screen",c:colorFor("Home Screen"),ct:0},
+    {n:"Login Screen",c:colorFor("Login Screen"),ct:0},
+    {n:"Signup Screen",c:colorFor("Signup Screen"),ct:0},
+    {n:"Onboarding Screen",c:colorFor("Onboarding Screen"),ct:0},
+    {n:"Search Screen",c:colorFor("Search Screen"),ct:0},
+    {n:"Profile Screen",c:colorFor("Profile Screen"),ct:0},
+    {n:"Settings Screen",c:colorFor("Settings Screen"),ct:0},
+    {n:"Detail Screen",c:colorFor("Detail Screen"),ct:0},
+    {n:"List Screen",c:colorFor("List Screen"),ct:0},
+    {n:"Checkout Screen",c:colorFor("Checkout Screen"),ct:0},
+    {n:"Empty State Screen",c:colorFor("Empty State Screen"),ct:0},
+    {n:"Dashboard Screen",c:colorFor("Dashboard Screen"),ct:0}
+  ];
 const S={
-  pName:'Untitled Project',mode:'annotate',
+  pName:'Untitled Project',mode:'annotate',theme:'light',userNamedProject:false,autoProjectName:'',
   imgs:[],anns:{},
-  labels:[
-    {n:'Button',c:'#5b7cf6'},{n:'Card',c:'#22d3a5'},{n:'Bottom Nav Bar',c:'#f59e0b'},
-    {n:'Input Field',c:'#ec4899'},{n:'Icon',c:'#a78bfa'},{n:'Text Block',c:'#60a5fa'},
-    {n:'Image',c:'#f97316'},{n:'Header',c:'#34d399'},{n:'Modal',c:'#fb7185'},
-    {n:'Toggle',c:'#c084fc'},{n:'Checkbox',c:'#fbbf24'},{n:'Dropdown',c:'#38bdf8'},
-    {n:'Tab Bar',c:'#4ade80'},{n:'FAB',c:'#f472b6'},{n:'Search Bar',c:'#818cf8'},
-  ],
-  screens:[
-    {n:'Home Screen',c:'#38bdf8'},{n:'Login Screen',c:'#f472b6'},
-    {n:'Profile Screen',c:'#a3e635'},{n:'Settings Screen',c:'#fb923c'},
-    {n:'Onboarding',c:'#e879f9'},{n:'Dashboard',c:'#2dd4bf'},
-    {n:'Detail Screen',c:'#fbbf24'},{n:'List Screen',c:'#67e8f9'},
-    {n:'Checkout',c:'#f87171'},{n:'Empty State',c:'#94a3b8'},
-  ],
+  labels:[...DEFAULT_UI_ELEMENTS],
+  screens:[...DEFAULT_SCREEN_TYPES],
   cur:-1,selLbl:null,selAnn:null,tool:'box',
   hist:[],undoSt:[],redoSt:[],
   comments:{},imgST:{},
   idCtr:{},flags:{},
   zoom:1,px:0,py:0,
   tab:'labels',expFmt:'coco',
-  imgSearch:'',
+  imgSearch:'',labelSearch:'',recentLabels:[],
   rev:{imgs:[],anns:{},origAnns:{},flags:{},comments:{},loaded:false},
 };
 const LC={};
@@ -345,8 +607,7 @@ function gc(n){
   if(LC[n])return LC[n];
   const a=[...S.labels,...S.screens].find(l=>l.n===n);
   if(a){LC[n]=a.c;return a.c;}
-  const h=Array.from(n).reduce((a,c)=>a+c.charCodeAt(0),0)%360;
-  return LC[n]=`hsl(${h},65%,60%)`;
+  return LC[n]=colorFor(n);
 }
 function clrLC(){Object.keys(LC).forEach(k=>delete LC[k]);}
 
@@ -367,7 +628,7 @@ function h2r(hex,a){
 function render(){
   if(!imgO)return;
   ctx.clearRect(0,0,cv.width,cv.height);
-  ctx.fillStyle='#080a0e';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle=getComputedStyle(document.body).getPropertyValue('--sur3')||'#edf1f7';ctx.fillRect(0,0,cv.width,cv.height);
   ctx.save();ctx.translate(S.px,S.py);ctx.scale(S.zoom,S.zoom);
   ctx.drawImage(imgO,0,0);
   const anns=curAnns();
@@ -455,9 +716,24 @@ document.body.addEventListener('drop',e=>{
   const f=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));if(f.length)loadFiles(f);
 });
 
+function getFolderNameFromFiles(files){
+  const f=files.find(x=>x.webkitRelativePath);
+  if(!f||!f.webkitRelativePath)return'';
+  return f.webkitRelativePath.split('/')[0]||'';
+}
+function applyProjectNameFromFolder(folderName){
+  const clean=(folderName||'').trim();
+  if(!clean)return;
+  S.autoProjectName=clean;
+  if(!S.userNamedProject||!S.pName||S.pName==='Untitled Project'){
+    S.pName=clean;
+    document.getElementById('projName').textContent=clean;
+  }
+}
 function loadFiles(files){
   const imgs=files.filter(f=>f.type.startsWith('image/')).sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
   if(!imgs.length)return;
+  applyProjectNameFromFolder(getFolderNameFromFiles(files));
   const ex=new Set(S.imgs.map(i=>i.name));
   const nw=imgs.filter(f=>!ex.has(f.name)).map(f=>({name:f.name,src:URL.createObjectURL(f),w:0,h:0}));
   S.imgs=[...S.imgs,...nw];
@@ -533,7 +809,15 @@ function redo(){
 function logH(action,name){S.hist.unshift({action,name,ts:Date.now(),mode:S.mode});if(S.hist.length>200)S.hist.pop();if(S.tab==='history')renderRP();}
 
 // ═══════════════════════════ LABELS ═══════════════════════════
-function selLbl(n){S.selLbl=n;if(S.tool!=='select')setTool('box');renderRP();renderQB();}
+function rememberRecentLabel(n){
+  S.recentLabels=[n,...S.recentLabels.filter(x=>x!==n)].slice(0,12);
+}
+function selLbl(n){
+  S.selLbl=n;
+  rememberRecentLabel(n);
+  if(S.tool!=='select')setTool('box');
+  renderRP();renderQB();
+}
 function addLabel(n,isScreen){
   if(!n.trim())return;
   if(S.labels.find(l=>l.n===n)||S.screens.find(l=>l.n===n)){toast('Label exists');return;}
@@ -579,7 +863,7 @@ let _rf=[],_rj=null;
 document.getElementById('rfi').addEventListener('change',e=>{
   _rf=Array.from(e.target.files).filter(f=>f.type.startsWith('image/'));
   _rf.sort((a,b)=>a.name.localeCompare(b.name,undefined,{numeric:true}));
-  document.getElementById('rfstat').textContent=`✓ ${_rf.length} images selected`;e.target.value='';
+  const folder=getFolderNameFromFiles(_rf);if(folder)applyProjectNameFromFolder(folder);document.getElementById('rfstat').textContent=`✓ ${_rf.length} images selected${folder?` · ${folder}`:''}`;e.target.value='';
 });
 document.getElementById('rji').addEventListener('change',e=>{
   const f=e.target.files[0];if(!f)return;
@@ -592,6 +876,7 @@ function activateReview(){
   if(!_rj){toast('Load annotation JSON first');return;}
   window._aImgs=(window._aImgs||S.imgs.filter(i=>!i._r));
   const imgs=_rf.map(f=>({name:f.name,src:URL.createObjectURL(f),w:0,h:0,_r:true}));
+  applyProjectNameFromFolder(getFolderNameFromFiles(_rf));
   S.rev.imgs=imgs;
   const parsed=parseJSON(_rj);
   S.rev.anns=parsed.anns;S.rev.origAnns=JSON.parse(JSON.stringify(parsed.anns));
@@ -719,17 +1004,44 @@ function renderRevRP(){
   switch(S.tab){case'review':reviewP();break;case'boxes':boxesP(true);break;case'labels':labelsP();break;case'stats':statsP(true);break;case'history':histP();break;case'notes':notesP(true);}
 }
 
+
+function getFilteredUILabels(){
+  const q=S.labelSearch.trim().toLowerCase();
+  const sorted=[...S.labels].sort((a,b)=>(b.ct||0)-(a.ct||0)||a.n.localeCompare(b.n));
+  if(!q)return sorted;
+  return sorted.filter(l=>l.n.toLowerCase().includes(q));
+}
+function getQuickUILabels(){
+  const byName=new Map(S.labels.map(l=>[l.n,l]));
+  const recent=S.recentLabels.map(n=>byName.get(n)).filter(Boolean);
+  const popular=[...S.labels].sort((a,b)=>(b.ct||0)-(a.ct||0)).slice(0,12);
+  const filtered=getFilteredUILabels().slice(0,24);
+  const merged=[];
+  [...recent,...popular,...filtered].forEach(l=>{
+    if(l && !merged.find(x=>x.n===l.n)) merged.push(l);
+  });
+  return merged.slice(0,18);
+}
+
 function labelsP(){
   const src=S.mode==='review'?S.rev.anns:S.anns;
   const cnts={};Object.values(src).forEach(a=>a.forEach(x=>{cnts[x.label]=(cnts[x.label]||0)+1;}));
+  const filtered=getFilteredUILabels();
+  const quick=getQuickUILabels();
   const chip=l=>{const isSel=S.selLbl===l.n,cnt=cnts[l.n]||0;
     return`<div class="lchip ${isSel?'ls':''}" style="--cc:${l.c}" onclick="selLbl('${e(l.n)}')">
-      <div class="lcname">${e(l.n)}</div>${cnt?`<div class="lccnt">${cnt}</div>`:''}
+      <div class="lcname">${e(l.n)}</div>
+      <div style="display:flex;gap:4px;align-items:center;">${typeof l.ct==='number'?`<span class="count-pill">${l.ct.toLocaleString()}</span>`:''}${cnt?`<div class="lccnt">${cnt}</div>`:''}</div>
       <button class="lcdel" onclick="event.stopPropagation();delLabel('${e(l.n)}')">✕</button></div>`;
   };
   document.getElementById('PC').innerHTML=`
     <div class="psec">UI Elements <button class="psecbtn" onclick="promptAddLabel(false)">+ Add</button></div>
-    <div class="lgrid">${S.labels.map(chip).join('')}</div>
+    <div class="lhelper"><b>Priority:</b> annotate UI elements first. Use search, then pick from quick labels. Reviewers can relabel from the same list.</div>
+    <div class="label-search-row"><input class="addli" placeholder="Search UI elements…" value="${e(S.labelSearch)}" oninput="S.labelSearch=this.value;labelsP();renderQB()"></div>
+    <div class="psec">Quick Picks <span style="font-size:8px;color:var(--tx3);text-transform:none;letter-spacing:0">popular + recent</span></div>
+    <div class="quickwrap">${quick.map(l=>`<button class="qsbtn ${S.selLbl===l.n?'active':''}" onclick="selLbl('${e(l.n)}')"><span>${e(l.n)}</span>${typeof l.ct==='number'?`<span class="qsmeta">${l.ct.toLocaleString()}</span>`:''}</button>`).join('')||'<div class="empty" style="padding:0">No quick labels</div>'}</div>
+    <div class="psec">All UI Elements <span style="font-size:8px;color:var(--tx3);text-transform:none;letter-spacing:0">${filtered.length} found</span></div>
+    <div class="lgrid">${filtered.map(chip).join('')||'<div class="empty">No matching UI elements</div>'}</div>
     <div class="psec">Screen Types <button class="psecbtn" onclick="promptAddLabel(true)">+ Add</button></div>
     <div class="lgrid">${S.screens.map(chip).join('')}</div>
     <div class="psec">Quick Add UI Element</div>
@@ -771,6 +1083,7 @@ function reviewP(){
   const allLbls=[...S.labels,...S.screens].map(l=>l.n);
   document.getElementById('PC').innerHTML=`
     <div class="psec" style="color:var(--pur)">Current Image</div>
+    <div class="review-helper"><b>Reviewer workflow:</b> approve clean images, flag unclear ones, or relabel boxes directly from the UI-element list. UI elements stay first to match the annotation pass.</div>
     <div style="padding:0 8px 8px;">
       <div style="font-family:var(--mono);font-size:9px;color:var(--tx2);line-height:1.8;">
         <b style="color:var(--txt)">${e(name)}</b><br>
@@ -887,7 +1200,9 @@ function relabel(id,newLabel){
 }
 
 function renderQB(){
-  const all=[...S.labels,...S.screens];
+  const quick=getQuickUILabels().slice(0,9);
+  const fallback=[...S.screens].slice(0,3);
+  const all=[...quick,...fallback.filter(l=>!quick.find(q=>q.n===l.n))];
   document.getElementById('QB').innerHTML=all.map(l=>`<div class="qchip ${S.selLbl===l.n?'qs':''}" style="--cc:${l.c};${S.selLbl===l.n?`border-color:${l.c};color:${l.c};`:''}" onclick="selLbl('${e(l.n)}')">${e(l.n)}</div>`).join('');
 }
 function switchTab(t){S.tab=t;renderRP();}
@@ -917,7 +1232,7 @@ function getSplits(){
   const sp={};sh.forEach((img,i)=>{sp[img.name]=i<te?'train':i<ve?'valid':'test';});return sp;
 }
 function doExport(){
-  const pn=S.pName.replace(/[^a-z0-9_-]/gi,'_').toLowerCase()||'frametag';
+  const pn=S.pName.replace(/[^a-z0-9_-]/gi,'_').toLowerCase()||'uiland';
   const src=S.mode==='review'?S.rev.anns:S.anns;const sp=getSplits();
   if(_ef==='coco')expCOCO(pn,src,sp);
   else if(_ef==='yolo')expYOLO(pn,src,sp);
@@ -949,7 +1264,7 @@ function expCOCO(pn,src,sp){
     });
     imgId++;
   });
-  dlJSON({info:{year:String(new Date().getFullYear()),version:'dataset',description:`${S.pName}`,contributor:'',url:'',date_created:now},licenses:[{id:1,url:'',name:'Unknown'}],categories,images,annotations},`${pn}_annotations.coco.json`);
+  dlJSON({info:{year:String(new Date().getFullYear()),version:'dataset',description:`Exported from Uiland — ${S.pName}`,contributor:'',url:'',date_created:now},licenses:[{id:1,url:'',name:'Unknown'}],categories,images,annotations},`${pn}_annotations.coco.json`);
 }
 function expYOLO(pn,src){
   const cls=[...S.labels,...S.screens].map(l=>l.n);
@@ -990,10 +1305,10 @@ function dlBlob(b,fn){const a=document.createElement('a');a.href=URL.createObjec
 
 // ═══════════════════════════ SESSION ═══════════════════════════
 function saveSession(){
-  const pn=S.pName.replace(/[^a-z0-9_-]/gi,'_').toLowerCase()||'frametag';
-  const sess={projectName:S.pName,labels:S.labels,screenTypes:S.screens,annotations:S.anns,imageScreenTypes:S.imgST,comments:S.comments,annIdCounter:S.idCtr,imageNames:S.imgs.filter(i=>!i._r).map(i=>i.name),savedAt:new Date().toISOString()};
+  const pn=S.pName.replace(/[^a-z0-9_-]/gi,'_').toLowerCase()||'uiland';
+  const sess={projectName:S.pName,theme:S.theme,labels:S.labels,screenTypes:S.screens,annotations:S.anns,imageScreenTypes:S.imgST,comments:S.comments,annIdCounter:S.idCtr,imageNames:S.imgs.filter(i=>!i._r).map(i=>i.name),savedAt:new Date().toISOString()};
   dlJSON(sess,`${pn}_session.json`);
-  try{localStorage.setItem('ft_sess',JSON.stringify(sess));}catch(err){}
+  try{localStorage.setItem('uiland_sess',JSON.stringify(sess));}catch(err){}
   toast('Session saved ✓');
 }
 function loadSess(data){
@@ -1001,6 +1316,7 @@ function loadSess(data){
     const s=typeof data==='string'?JSON.parse(data):data;
     S.pName=s.projectName||'Untitled Project';
     document.getElementById('projName').textContent=S.pName;
+    if(s.theme)setTheme(s.theme,false);
     if(s.labels)S.labels=s.labels;if(s.screenTypes)S.screens=s.screenTypes;
     if(s.annotations)S.anns=s.annotations;if(s.imageScreenTypes)S.imgST=s.imageScreenTypes;
     if(s.comments)S.comments=s.comments;if(s.annIdCounter)S.idCtr=s.annIdCounter;
@@ -1021,19 +1337,29 @@ document.getElementById('ii').addEventListener('change',e=>{
 });
 
 window.addEventListener('load',()=>{
-  try{const s=localStorage.getItem('ft_sess');if(s){const d=JSON.parse(s);loadSess(d);}}catch(err){}
+  try{const s=localStorage.getItem('uiland_sess');if(s){const d=JSON.parse(s);loadSess(d);}}catch(err){}
+  try{const theme=localStorage.getItem('uiland_theme');if(theme)setTheme(theme,false);else setTheme('light',false);}catch(err){setTheme('light',false);}
   renderLP();renderRP();renderQB();updateStats();
 });
 setInterval(()=>{
   if(!S.imgs.length)return;
-  try{localStorage.setItem('ft_sess',JSON.stringify({projectName:S.pName,labels:S.labels,screenTypes:S.screens,annotations:S.anns,imageScreenTypes:S.imgST,comments:S.comments,annIdCounter:S.idCtr,imageNames:S.imgs.filter(i=>!i._r).map(i=>i.name),savedAt:new Date().toISOString()}));}catch(err){}
+  try{localStorage.setItem('uiland_sess',JSON.stringify({projectName:S.pName,theme:S.theme,labels:S.labels,screenTypes:S.screens,annotations:S.anns,imageScreenTypes:S.imgST,comments:S.comments,annIdCounter:S.idCtr,imageNames:S.imgs.filter(i=>!i._r).map(i=>i.name),savedAt:new Date().toISOString()}));}catch(err){}
 },30000);
 
 // ═══════════════════════════ MODALS ═══════════════════════════
+function setTheme(theme,persist=true){
+  S.theme=theme==='dark'?'dark':'light';
+  document.body.classList.toggle('dark',S.theme==='dark');
+  document.getElementById('themeLight').classList.toggle('ta',S.theme==='light');
+  document.getElementById('themeDark').classList.toggle('ta',S.theme==='dark');
+  if(persist){try{localStorage.setItem('uiland_theme',S.theme);}catch(err){}}
+  render();
+}
+
 function openMdl(id){document.getElementById(id).classList.remove('hid');}
 function closeMdl(id){document.getElementById(id).classList.add('hid');}
 function openProjModal(){document.getElementById('pnInp').value=S.pName;openMdl('projMdl');}
-function saveProjName(){const v=document.getElementById('pnInp').value.trim();if(v){S.pName=v;document.getElementById('projName').textContent=v;}closeMdl('projMdl');}
+function saveProjName(){const v=document.getElementById('pnInp').value.trim();if(v){S.pName=v;S.userNamedProject=true;document.getElementById('projName').textContent=v;}closeMdl('projMdl');}
 function openLoadMdl(){openMdl('loadMdl');}
 document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',ev=>{if(ev.target===el)el.classList.add('hid');}));
 
