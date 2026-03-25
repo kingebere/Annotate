@@ -1338,7 +1338,7 @@ document.getElementById('ii').addEventListener('change',e=>{
 
 window.addEventListener('load',()=>{
   try{const s=localStorage.getItem('uiland_sess');if(s){const d=JSON.parse(s);loadSess(d);}}catch(err){}
-  try{const theme=localStorage.getItem('uiland_theme');if(theme)setTheme(theme,false);else setTheme('light',false);}catch(err){setTheme('light',false);}
+  try{const theme=localStorage.getItem('uiland_theme');if(theme)setTheme(theme,false);else setTheme('dark',false);}catch(err){setTheme('dark',false);}
   renderLP();renderRP();renderQB();updateStats();
 });
 setInterval(()=>{
@@ -1348,11 +1348,19 @@ setInterval(()=>{
 
 // ═══════════════════════════ MODALS ═══════════════════════════
 function setTheme(theme,persist=true){
-  S.theme=theme==='dark'?'dark':'light';
-  document.body.classList.toggle('dark',S.theme==='dark');
-  document.getElementById('themeLight').classList.toggle('ta',S.theme==='light');
-  document.getElementById('themeDark').classList.toggle('ta',S.theme==='dark');
-  if(persist){try{localStorage.setItem('uiland_theme',S.theme);}catch(err){}}
+  // DEFAULT → dark instead of light
+  S.theme = theme === 'light' ? 'light' : 'dark';
+
+  document.body.classList.toggle('dark', S.theme === 'dark');
+  document.getElementById('themeLight').classList.toggle('ta', S.theme === 'light');
+  document.getElementById('themeDark').classList.toggle('ta', S.theme === 'dark');
+
+  if(persist){
+    try{
+      localStorage.setItem('uiland_theme', S.theme);
+    }catch(err){}
+  }
+
   render();
 }
 
