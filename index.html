@@ -211,6 +211,7 @@ kbd{background:var(--sur3);border:1px solid var(--bdr);border-radius:2px;padding
   <div class="hstats">Images: <b id="hsi">0</b> &nbsp; Annotated: <b id="hsa">0</b> &nbsp; Boxes: <b id="hsb">0</b></div>
   <button class="hbtn" onclick="openLoadMdl()">📂 Load</button>
   <button class="hbtn" onclick="saveSession()">💾 Save</button>
+  <span id="asDot" title="Autosave status" style="width:7px;height:7px;border-radius:50%;background:var(--tx3);display:inline-block;flex-shrink:0;transition:background .4s;" title="Autosave"></span>
   <button class="hbtn pri" onclick="openExpMdl()">⬆ Export</button>
 </div>
 <div class="main">
@@ -229,6 +230,11 @@ kbd{background:var(--sur3);border:1px solid var(--bdr);border-radius:2px;padding
       <div class="tsep"></div>
       <div class="tbtn" onclick="undo()" title="Undo Ctrl+Z">↩</div>
       <div class="tbtn" onclick="redo()" title="Redo Ctrl+Y">↪</div>
+      <div class="tsep"></div>
+      <div class="tbtn" onclick="copyAnns()" title="Copy annotations (Ctrl+C)">⎘</div>
+      <div class="tbtn" onclick="pasteAnns()" title="Paste annotations (Ctrl+V)">⎙</div>
+      <div class="tbtn" onclick="openDupModal()" title="Duplicate to next images (Ctrl+D)">⧉</div>
+      <div class="tbtn" onclick="aiSuggest()" title="AI auto-suggest labels (A)">✦</div>
       <div class="tbr">
         <span class="ictr" id="ictr">— / —</span>
         <div class="nvbtn" onclick="prevImg()">‹ Prev</div>
@@ -238,7 +244,7 @@ kbd{background:var(--sur3);border:1px solid var(--bdr);border-radius:2px;padding
     <div class="cwrap" id="CW">
       <div class="cempty" id="CE"><div class="cei">🖼</div><div>Load a folder of images to begin</div></div>
       <canvas id="mc" style="display:none;"></canvas>
-      <div class="kbhint" id="KH" style="display:none;"><kbd>B</kbd> Box &nbsp;<kbd>S</kbd> Select &nbsp;<kbd>Del</kbd> Remove &nbsp;<kbd>←→</kbd> Navigate &nbsp;<kbd>1-9</kbd> Quick UI &nbsp;<kbd>Ctrl+Z</kbd> Undo</div>
+      <div class="kbhint" id="KH" style="display:none;"><kbd>B</kbd> Box &nbsp;<kbd>S</kbd> Select &nbsp;<kbd>Del</kbd> Remove &nbsp;<kbd>←→</kbd> Navigate &nbsp;<kbd>1-9</kbd> Quick UI &nbsp;<kbd>Ctrl+Z</kbd> Undo &nbsp;<kbd>Ctrl+C/V</kbd> Copy/Paste &nbsp;<kbd>Tab</kbd> Cycle label &nbsp;<kbd>↑↓←→</kbd> Nudge box &nbsp;<kbd>A</kbd> AI Suggest</div>
       <div class="revbadge" id="RB" style="display:none;">🔍 Review Mode — annotating &amp; editing enabled</div>
     </div>
     <div class="qbar" id="QB" style="display:none;"></div>
@@ -328,6 +334,37 @@ kbd{background:var(--sur3);border:1px solid var(--bdr);border-radius:2px;padding
 
 <input type="file" id="fi" multiple accept="image/*" webkitdirectory>
 <div class="tt" id="TT"></div>
+
+<!-- DUPLICATE MODAL -->
+<div class="overlay hid" id="dupMdl">
+  <div class="modal" style="width:360px;">
+    <div class="mtitle">⧉ Copy Annotations</div>
+    <div class="msub">Copy current image's annotations to adjacent images</div>
+    <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:14px;">
+      <label style="font-family:var(--mono);font-size:10px;color:var(--tx2);">Copy to next <input class="spinp" id="dupN" type="number" value="1" min="1" max="50" style="margin:0 5px;"> images</label>
+      <label style="font-family:var(--mono);font-size:10px;color:var(--tx2);display:flex;align-items:center;gap:6px;"><input type="checkbox" id="dupMerge" checked> Merge with existing (don't overwrite)</label>
+      <label style="font-family:var(--mono);font-size:10px;color:var(--tx2);display:flex;align-items:center;gap:6px;"><input type="checkbox" id="dupPrev"> Also copy to previous images</label>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--tx3);padding:6px 8px;background:var(--sur2);border-radius:5px;border:1px solid var(--bdr);" id="dupPreview">—</div>
+    </div>
+    <div class="macts">
+      <button class="mbtn2" onclick="closeMdl('dupMdl')">Cancel</button>
+      <button class="mbtn2 mp" onclick="doDuplicate()">Copy ↓</button>
+    </div>
+  </div>
+</div>
+
+<!-- AI SUGGEST MODAL -->
+<div class="overlay hid" id="suggestMdl">
+  <div class="modal" style="width:420px;">
+    <div class="mtitle">✦ AI Label Suggestions</div>
+    <div class="msub" id="suggestSub">Analyzing annotation patterns across your dataset…</div>
+    <div id="suggestList" style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px;max-height:340px;overflow-y:auto;"></div>
+    <div class="macts">
+      <button class="mbtn2" onclick="closeMdl('suggestMdl')">Close</button>
+      <button class="mbtn2 mp" onclick="applyAllSuggestions()">Apply All ↓</button>
+    </div>
+  </div>
+</div>
 
 <script>
 // ═══════════════════════════ STATE ═══════════════════════════
@@ -614,6 +651,8 @@ function clrLC(){Object.keys(LC).forEach(k=>delete LC[k]);}
 // ═══════════════════════════ CANVAS ═══════════════════════════
 const cv=document.getElementById('mc'),ctx=cv.getContext('2d');
 let imgO=null,draw=false,ds={x:0,y:0},dc={x:0,y:0},panning=false,ps={x:0,y:0},po={x:0,y:0},hov=null;
+let _clipboard=[]; // copied annotations
+let _suggestions=[]; // pending AI suggestions
 
 function curAnns(){
   const img=S.imgs[S.cur];if(!img)return[];
@@ -699,6 +738,17 @@ cv.addEventListener('mouseup',e=>{
   render();renderRP();renderLP();updateStats();
 });
 cv.addEventListener('mouseleave',()=>{hideTT();hov=null;render();});
+// Zoom to selected annotation (F key handled in keydown)
+function zoomToSel(){
+  if(!S.selAnn||!imgO)return;
+  const a=curAnns().find(x=>x.id===S.selAnn);if(!a)return;
+  const cw=document.getElementById('CW');const W=cw.clientWidth,H=cw.clientHeight;
+  const pad=60;
+  S.zoom=Math.min((W-pad*2)/a.w,(H-pad*2)/a.h,10);
+  S.px=W/2-((a.x+a.w/2)*S.zoom);S.py=H/2-((a.y+a.h/2)*S.zoom);
+  document.getElementById('zl').textContent=Math.round(S.zoom*100)+'%';render();
+}
+
 cv.addEventListener('wheel',e=>{
   e.preventDefault();
   const f=e.deltaY<0?1.1:.91;const r=cv.getBoundingClientRect();
@@ -1212,6 +1262,195 @@ function updateStats(){
   document.getElementById('hsi').textContent=t;document.getElementById('hsa').textContent=a;document.getElementById('hsb').textContent=b;
 }
 
+// ═══════════════════════════ COPY / PASTE / DUPLICATE ═══════════════════════
+function copyAnns(){
+  const img=S.imgs[S.cur];if(!img)return;
+  const src=S.mode==='review'?S.rev.anns:S.anns;
+  const anns=src[img.name]||[];
+  if(S.selAnn){
+    // Copy only selected annotation
+    const a=anns.find(x=>x.id===S.selAnn);
+    _clipboard=a?[{...a}]:[];
+  } else {
+    // Copy all annotations on current image
+    _clipboard=anns.map(a=>({...a}));
+  }
+  toast(`Copied ${_clipboard.length} annotation${_clipboard.length!==1?'s':''}`);
+}
+
+function pasteAnns(){
+  if(!_clipboard.length){toast('Nothing to paste');return;}
+  const img=S.imgs[S.cur];if(!img)return;
+  const src=S.mode==='review'?S.rev.anns:S.anns;
+  if(!src[img.name])src[img.name]=[];
+  if(!S.idCtr[img.name])S.idCtr[img.name]=1;
+  pushUndo();
+  // Offset paste by 12px so they don't exactly overlap
+  const offset=_clipboard.length>1?0:12;
+  _clipboard.forEach(a=>{
+    src[img.name].push({...a,id:String(S.idCtr[img.name]++),x:a.x+offset,y:a.y+offset});
+  });
+  if(S.mode==='review')markEdit(img.name);
+  logH(`Pasted ${_clipboard.length} annotation${_clipboard.length!==1?'s':''}`,img.name);
+  render();renderRP();renderLP();updateStats();
+  toast(`Pasted ${_clipboard.length} annotation${_clipboard.length!==1?'s':''}`);
+}
+
+function openDupModal(){
+  const img=S.imgs[S.cur];if(!img){toast('Load an image first');return;}
+  const src=S.mode==='review'?S.rev.anns:S.anns;
+  const anns=src[img.name]||[];
+  if(!anns.length){toast('No annotations on this image to duplicate');return;}
+  // Update preview text
+  const n=parseInt(document.getElementById('dupN').value)||1;
+  _updateDupPreview();
+  openMdl('dupMdl');
+}
+
+function _updateDupPreview(){
+  const img=S.imgs[S.cur];if(!img)return;
+  const n=parseInt(document.getElementById('dupN').value)||1;
+  const prev=document.getElementById('dupPrev').checked;
+  const targets=[];
+  for(let i=1;i<=n;i++){if(S.cur+i<S.imgs.length)targets.push(S.imgs[S.cur+i].name);}
+  if(prev)for(let i=1;i<=n;i++){if(S.cur-i>=0)targets.unshift(S.imgs[S.cur-i].name);}
+  document.getElementById('dupPreview').textContent=
+    targets.length?`Will copy to: ${targets.map(t=>t.length>20?t.slice(0,18)+'…':t).join(', ')}`:'No target images in range';
+}
+
+// Wire preview updates
+document.addEventListener('DOMContentLoaded',()=>{
+  ['dupN','dupPrev'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('change',_updateDupPreview);});
+});
+
+function doDuplicate(){
+  const img=S.imgs[S.cur];if(!img)return;
+  const src=S.mode==='review'?S.rev.anns:S.anns;
+  const anns=src[img.name]||[];if(!anns.length)return;
+  const n=parseInt(document.getElementById('dupN').value)||1;
+  const merge=document.getElementById('dupMerge').checked;
+  const prev=document.getElementById('dupPrev').checked;
+  const indices=[];
+  for(let i=1;i<=n;i++){if(S.cur+i<S.imgs.length)indices.push(S.cur+i);}
+  if(prev)for(let i=1;i<=n;i++){if(S.cur-i>=0)indices.push(S.cur-i);}
+  let copied=0;
+  indices.forEach(idx=>{
+    const tgt=S.imgs[idx];if(!tgt)return;
+    if(!src[tgt.name])src[tgt.name]=[];
+    if(!S.idCtr[tgt.name])S.idCtr[tgt.name]=1;
+    if(!merge)src[tgt.name]=[];
+    anns.forEach(a=>{
+      // Skip if identical label+position already exists (avoid true duplicates on merge)
+      const already=merge&&src[tgt.name].some(x=>x.label===a.label&&Math.abs(x.x-a.x)<2&&Math.abs(x.y-a.y)<2);
+      if(!already){src[tgt.name].push({...a,id:String(S.idCtr[tgt.name]++)});copied++;}
+    });
+  });
+  logH(`Duplicated ${anns.length} anns to ${indices.length} images`,img.name);
+  closeMdl('dupMdl');renderLP();updateStats();
+  toast(`Copied to ${indices.length} image${indices.length!==1?'s':''} (${copied} boxes)`);
+}
+
+// ═══════════════════════════ AI SUGGEST ══════════════════════════
+// Pattern-based label inference: finds which UI labels co-occur most
+// on images that share any labels with the current image, then ranks
+// the labels NOT yet on this image by co-occurrence frequency.
+function aiSuggest(){
+  const img=S.imgs[S.cur];
+  if(!img){toast('Load an image first');return;}
+  const src=S.mode==='review'?S.rev.anns:S.anns;
+  const cur=src[img.name]||[];
+  const curSet=new Set(cur.map(a=>a.label));
+
+  // Build co-occurrence matrix from all annotated images
+  const coCount={};
+  Object.entries(src).forEach(([nm,anns])=>{
+    if(nm===img.name||!anns.length)return;
+    const lbls=[...new Set(anns.map(a=>a.label))];
+    lbls.forEach(l1=>{
+      lbls.forEach(l2=>{
+        if(l1!==l2){
+          if(!coCount[l1])coCount[l1]={};
+          coCount[l1][l2]=(coCount[l1][l2]||0)+1;
+        }
+      });
+    });
+  });
+
+  // Score each unseen label based on co-occurrence with labels already on this image
+  const scores={};
+  curSet.forEach(lbl=>{
+    const co=coCount[lbl]||{};
+    Object.entries(co).forEach(([l2,cnt])=>{
+      if(!curSet.has(l2)){scores[l2]=(scores[l2]||0)+cnt;}
+    });
+  });
+
+  // Also add: find images with high overlap in label sets → suggest their unique labels
+  const simImages=[];
+  Object.entries(src).forEach(([nm,anns])=>{
+    if(nm===img.name||!anns.length)return;
+    const theirSet=new Set(anns.map(a=>a.label));
+    const overlap=[...curSet].filter(l=>theirSet.has(l)).length;
+    if(overlap>0)simImages.push({nm,overlap,anns,theirSet});
+  });
+  simImages.sort((a,b)=>b.overlap-a.overlap).slice(0,5).forEach(({anns,overlap})=>{
+    anns.forEach(a=>{
+      if(!curSet.has(a.label))scores[a.label]=(scores[a.label]||0)+overlap*2;
+    });
+  });
+
+  // Sort by score, take top 12
+  const ranked=Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,12);
+
+  if(!ranked.length){
+    // Fallback: most common labels globally not yet on this image
+    const global={};
+    Object.values(src).flat().forEach(a=>{if(!curSet.has(a.label))global[a.label]=(global[a.label]||0)+1;});
+    Object.entries(global).sort((a,b)=>b[1]-a[1]).slice(0,8).forEach(([n,cnt])=>ranked.push([n,cnt]));
+  }
+
+  _suggestions=ranked;
+
+  // Render suggest modal
+  document.getElementById('suggestSub').textContent=
+    curSet.size
+      ?`Based on ${curSet.size} label${curSet.size!==1?'s':''} on this image and ${simImages.length} similar images`
+      :'Global frequency ranking (no labels on this image yet)';
+
+  document.getElementById('suggestList').innerHTML=ranked.length
+    ?ranked.map(([n,score],i)=>{
+      const cl=gc(n);
+      const already=curSet.has(n);
+      return`<div style="display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:5px;border:1px solid var(--bdr);background:var(--sur2);">
+        <div style="width:9px;height:9px;border-radius:2px;background:${cl};flex-shrink:0;"></div>
+        <div style="flex:1;font-family:var(--mono);font-size:10px;color:var(--txt);">${e(n)}</div>
+        <div style="font-family:var(--mono);font-size:8px;color:var(--tx3);">score ${score}</div>
+        ${already
+          ?'<span style="font-family:var(--mono);font-size:8px;color:var(--grn);">✓ on image</span>'
+          :`<button onclick="selectSuggestion('${e(n)}')" style="padding:3px 8px;border:1px solid ${cl};border-radius:4px;background:transparent;color:${cl};font-family:var(--mono);font-size:9px;cursor:pointer;">Select</button>`
+        }
+      </div>`;
+    }).join('')
+    :'<div class="empty">Not enough data to suggest — annotate more images first</div>';
+
+  openMdl('suggestMdl');
+}
+
+function selectSuggestion(n){
+  selLbl(n);closeMdl('suggestMdl');toast(`"${n}" selected — draw a box`);
+}
+
+function applyAllSuggestions(){
+  if(!_suggestions.length)return;
+  // Select the top unseen suggestion
+  const img=S.imgs[S.cur];
+  const src=S.mode==='review'?S.rev.anns:S.anns;
+  const cur=new Set((src[img?.name]||[]).map(a=>a.label));
+  const top=_suggestions.find(([n])=>!cur.has(n));
+  if(top){selLbl(top[0]);toast(`"${top[0]}" selected — draw a box`);}
+  closeMdl('suggestMdl');
+}
+
 // ═══════════════════════════ EXPORT ═══════════════════════════
 let _ef='coco';
 function selExp(f){
@@ -1337,14 +1576,33 @@ document.getElementById('ii').addEventListener('change',e=>{
 });
 
 window.addEventListener('load',()=>{
-  try{const s=localStorage.getItem('uiland_sess');if(s){const d=JSON.parse(s);loadSess(d);}}catch(err){}
+  try{const s=localStorage.getItem('uiland_sess');if(s){
+    const d=JSON.parse(s);
+    loadSess(d);
+    // Show offline restore banner if session is recent (< 4h)
+    const age=Date.now()-new Date(d.savedAt||0).getTime();
+    if(age<4*60*60*1000&&d.imageNames&&d.imageNames.length){
+      const b=document.createElement('div');
+      b.style.cssText='position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:900;background:var(--sur);border:1px solid var(--grn);border-radius:7px;padding:9px 16px;font-family:var(--mono);font-size:10px;color:var(--txt);display:flex;align-items:center;gap:10px;box-shadow:0 4px 18px rgba(0,0,0,.25);white-space:nowrap;';
+      b.innerHTML=`<span style="color:var(--grn)">⟳ Offline session found</span> <span style="color:var(--tx2)">"${e(d.projectName||'Untitled')}" · ${d.imageNames.length} images · ${new Date(d.savedAt).toLocaleTimeString()}</span>`+
+        `<button onclick="this.parentNode.remove()" style="border:none;background:none;color:var(--tx3);cursor:pointer;font-size:12px;padding:0 3px;">✕</button>`;
+      document.body.appendChild(b);
+      setTimeout(()=>{if(b.parentNode)b.remove();},7000);
+    }
+  }}catch(err){}
   try{const theme=localStorage.getItem('uiland_theme');if(theme)setTheme(theme,false);else setTheme('dark',false);}catch(err){setTheme('dark',false);}
   renderLP();renderRP();renderQB();updateStats();
 });
-setInterval(()=>{
+function _autoSave(){
   if(!S.imgs.length)return;
-  try{localStorage.setItem('uiland_sess',JSON.stringify({projectName:S.pName,theme:S.theme,labels:S.labels,screenTypes:S.screens,annotations:S.anns,imageScreenTypes:S.imgST,comments:S.comments,annIdCounter:S.idCtr,imageNames:S.imgs.filter(i=>!i._r).map(i=>i.name),savedAt:new Date().toISOString()}));}catch(err){}
-},30000);
+  try{
+    localStorage.setItem('uiland_sess',JSON.stringify({projectName:S.pName,theme:S.theme,labels:S.labels,screenTypes:S.screens,annotations:S.anns,imageScreenTypes:S.imgST,comments:S.comments,annIdCounter:S.idCtr,imageNames:S.imgs.filter(i=>!i._r).map(i=>i.name),savedAt:new Date().toISOString()}));
+    // Flash autosave dot green
+    const dot=document.getElementById('asDot');
+    if(dot){dot.style.background='var(--grn)';setTimeout(()=>{dot.style.background='var(--tx3)';},1800);}
+  }catch(err){}
+}
+setInterval(_autoSave,30000);
 
 // ═══════════════════════════ MODALS ═══════════════════════════
 function setTheme(theme,persist=true){
@@ -1374,6 +1632,23 @@ document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',ev
 // ═══════════════════════════ KEYBOARD ═══════════════════════════
 document.addEventListener('keydown',ev=>{
   if(ev.target.tagName==='INPUT'||ev.target.tagName==='TEXTAREA'||ev.target.tagName==='SELECT')return;
+
+  // ── Arrow keys: nudge selected annotation OR navigate images ──────────────
+  if((ev.key==='ArrowRight'||ev.key==='ArrowLeft'||ev.key==='ArrowUp'||ev.key==='ArrowDown')&&S.selAnn&&S.tool==='select'){
+    ev.preventDefault();
+    const img=S.imgs[S.cur];if(!img)return;
+    const src=S.mode==='review'?S.rev.anns:S.anns;
+    const a=(src[img.name]||[]).find(x=>x.id===S.selAnn);if(!a)return;
+    const step=ev.shiftKey?10:1;
+    pushUndo();
+    if(ev.key==='ArrowRight')a.x+=step;
+    else if(ev.key==='ArrowLeft')a.x-=step;
+    else if(ev.key==='ArrowDown')a.y+=step;
+    else if(ev.key==='ArrowUp')a.y-=step;
+    if(S.mode==='review')markEdit(img.name);
+    render();renderRP();return;
+  }
+
   if(ev.key==='b'||ev.key==='B')setTool('box');
   else if(ev.key==='s'||ev.key==='S')setTool('select');
   else if(ev.key===' '){ev.preventDefault();setTool('pan');}
@@ -1383,9 +1658,22 @@ document.addEventListener('keydown',ev=>{
   else if(ev.key==='+'||ev.key==='=')zoom(1.2);
   else if(ev.key==='-')zoom(.83);
   else if(ev.key==='0')rzoom();
+  else if(ev.key==='f'||ev.key==='F'){ev.preventDefault();zoomToSel();}
+  else if(ev.key==='a'||ev.key==='A'){ev.preventDefault();aiSuggest();}
+  else if(ev.key==='Tab'){
+    // Cycle through labels
+    ev.preventDefault();
+    const all=[...S.labels,...S.screens];
+    if(!all.length)return;
+    const idx=S.selLbl?all.findIndex(l=>l.n===S.selLbl):-1;
+    const next=all[(idx+1)%all.length];if(next)selLbl(next.n);
+  }
   else if((ev.ctrlKey||ev.metaKey)&&ev.key==='z'){ev.preventDefault();undo();}
   else if((ev.ctrlKey||ev.metaKey)&&ev.key==='y'){ev.preventDefault();redo();}
   else if((ev.ctrlKey||ev.metaKey)&&ev.key==='s'){ev.preventDefault();saveSession();}
+  else if((ev.ctrlKey||ev.metaKey)&&ev.key==='c'){ev.preventDefault();copyAnns();}
+  else if((ev.ctrlKey||ev.metaKey)&&ev.key==='v'){ev.preventDefault();pasteAnns();}
+  else if((ev.ctrlKey||ev.metaKey)&&ev.key==='d'){ev.preventDefault();openDupModal();}
   else if(ev.key>='1'&&ev.key<='9'){const all=[...S.labels,...S.screens];const idx=parseInt(ev.key)-1;if(all[idx])selLbl(all[idx].n);}
 });
 document.addEventListener('keyup',ev=>{if(ev.key===' ')setTool('box');});
